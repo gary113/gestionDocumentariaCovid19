@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión documentaria Covid19</title>
+    <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
+</head>
+<body> 
+    <div class="container">
+        <nav class="level -item">
+            <p class="level-item has-text-centered">
+                <a class="link is-info" href="MenuPrincipal.html">Menu Principal</a>
+            </p>
+            <p class="level-item has-text-centered">
+                <a class="link is-info" href="MenuInicioOrg.html">Inicio</a>
+            </p>
+            <p class="level-item has-text-centered">
+                <a class="link is-info" href="PublicarDocumento.html">Publicar Documentos</a>
+            </p>
+            <p class="level-item has-text-centered">
+                <a class="link is-info" href="ValidarDocumento.html">Validar Documentos</a>
+            </p>
+            <p class="level-item has-text-centered">
+                <a class="link is-info">Cerrar Sesión</a>
+            </p>
+        </nav>
+    </div>
+    <div class="container">
+        <br>
+        <h2 class="title is-3">Publicar documento</h2>
+        <form action="" id="form-subir">
+            <div class="field">
+                <label class="label">Documento</label>
+            </div>
+            <div id="file-js-example" class="file has-name">
+                <label class="file-label">
+                  <input class="file-input" type="file" name="archivo" required>
+                  <span class="file-cta">
+                    <span class="file-label">
+                    Escoge un archivo
+                    </span>
+                  </span>
+                  <span class="file-name">
+                    No hay archivo seleccionado
+                  </span>
+                </label>
+            </div>
+            <br>
+            <div class="barra">
+                <div class="barra_azul" id="barra_estado">
+                    <span></span>
+                </div>
+            </div>
+            <br>
+            <div class="buttons">
+                <input type="submit" class="button is-primary" value="Publicar">
+                <input type="button" class="button is-danger" value="Cancelar">
+              </div>
+        </form>
+    </div>
+    <script src="js/subir.js"></script>
+    <script>
+        const fileInput = document.querySelector('#file-js-example input[type=file]');
+        fileInput.onchange = () => {
+          if (fileInput.files.length > 0) {
+            const fileName = document.querySelector('#file-js-example .file-name');
+            fileName.textContent = fileInput.files[0].name;
+          }
+        }
+    </script>
+</body>
+</html>

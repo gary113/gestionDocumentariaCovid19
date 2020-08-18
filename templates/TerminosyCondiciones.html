@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
-    <link rel="stylesheet" href="node_modules/bulma/css/bulma.min.css">
+    <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
 </head>
 <body>
     <div class="container">
@@ -29,15 +29,17 @@
     <div class="container">
         <br>
         <br>
-        <h2 class="title is-3">Subir documento</h2>
-        <p>Documento:</p>
+        <h1 class="title is-3">Descarga</h1>
         <br>
-        <form action="/uploader" method="POST" enctype="multipart/form-data">
-            <input type="file" name="archivo" value="Seleccionar archivo">
-            <br>
-            <br>
-            <input type="submit" value="Subir archivo">
-        </form>
+        <br>
+        <p>Recuerda que la descarga del siguiente documento debe realizarse solo</p>
+        <p>fines académicos</p>
+        <br>
+        <br>
+        <input type="checkbox">Acepto los terminos y condiciones<br><br>
+        <br>
+        <br>
+        <button class="button">Descargar</button>
     </div>
 </body>
 </html>

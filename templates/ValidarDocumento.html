@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
-    <link rel="stylesheet" href="node_modules/bulma/css/bulma.min.css">
+    <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
 </head>
 <body>
     <div class="container">
@@ -13,31 +13,27 @@
                 <a class="link is-info" href="MenuPrincipal.html">Menu Principal</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuInicioUser.html">Inicio</a>
+                <a class="link is-info" href="MenuInicioOrg.html">Inicio</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="Buscador.html">Buscar Documentos</a>
+                <a class="link is-info" href="PublicarDocumento.html">Publicar Documentos</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="SubirDocumento.html">Subir Documentos</a>
+                <a class="link is-info" href="ValidarDocumento.html">Validar Documentos</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info">Cerrar Sesión</a>
+                <a class="link is-info" href="IniciarSesion.html">Cerrar Sesión</a>
             </p>
         </nav>
     </div>
     <div class="container">
         <br>
         <br>
-        <h2 class="title is-3">Subir documento</h2>
-        <p>Documento:</p>
+        <h2 class="title is-3">Aviso</h2>
+        <p>¿Desea aceptar este documento?</p>
         <br>
-        <form action="/uploader" method="POST" enctype="multipart/form-data">
-            <input type="file" name="archivo" value="Seleccionar archivo">
-            <br>
-            <br>
-            <input type="submit" value="Subir archivo">
-        </form>
+        <button class="button">Aceptar</button>
+        <button class="button">Rechazar</button>
     </div>
 </body>
 </html>
