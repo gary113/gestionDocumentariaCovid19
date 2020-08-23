@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
     <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
 </head>
+
 <body>
     <div class="container">
         <nav class="level -item">
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuPrincipal.html">Menu Principal</a>
+                <a class="link is-info" href="MenuPrincipal.html">Inicio</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuInicioUser.html">Inicio</a>
+                <a class="link is-info" href="MenuInicioUser.html">Menú principal</a>
             </p>
             <p class="level-item has-text-centered">
                 <a class="link is-info" href="Buscador.html">Buscar Documentos</a>
@@ -22,27 +24,48 @@
                 <a class="link is-info" href="SubirDocumento.html">Subir Documentos</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="IniciarSesion.html">Cerrar Sesión</a>
+                <a class="link is-info" href="CerrarSesion.html">Cerrar Sesión</a>
             </p>
         </nav>
     </div>
     <div class="container">
         <br>
-        <br>
         <h2 class="title is-3">Subir documento</h2>
         <p>Documento:</p>
         <br>
         <form action="/SubirDocumento.html" method="POST" enctype="multipart/form-data">
+            <label>Título: </label>
+            <input type="text" name="titulo" size="50px">
+            <br>
+            <br>
+            <label>Idioma: </label>
+            <select name="idioma">
+                <option value="Español">Español</option>
+                <option value="English">English</option>
+                <option value="Portuguese">Portuguese</option>
+                <option value="Français">Français</option>
+            </select>
+            <br>
+            <br>
+            <label>Seleccione el archivo: </label>
+            <br>
             <input type="file" name="archivo" value="Seleccionar archivo">
             <br>
             <br>
-            <input type="submit" value="Subir archivo" onclick="subidaexitosa()">
-            <script>
-                function subidaexitosa(){
-                    alert("Mensaje subido correctamente")
-                }
-            </script>
+            <label>Palabras clave: </label>
+            <input type="text" name="palabras" size="100px">
+            <br>
+            <label>Nota: Solo subir documentos en formato pdf, las palabras deben ir separadas por comas y en
+                singular</label>
+            <br>
+            <br>
+            <input type="submit" value="Subir documento">
+            <br>
+            <br>
+            <label>{{mensaje}}</label>
+
         </form>
     </div>
 </body>
+
 </html>

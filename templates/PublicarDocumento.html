@@ -1,73 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
     <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
 </head>
-<body> 
+
+<body>
     <div class="container">
         <nav class="level -item">
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuPrincipal.html">Menu Principal</a>
+                <a class="link is-info" href="MenuPrincipal.html">Inicio</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuInicioOrg.html">Inicio</a>
+                <a class="link is-info" href="MenuInicioOrg.html">Menú principal</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="PublicarDocumento.html">Publicar Documentos</a>
+                <a class="link is-info" href="PublicarDocumento.html">Publicar documentos</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="ValidarDocumento.html">Validar Documentos</a>
+                <a class="link is-info" href="ValidarDocumento.html">Validar documentos</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info">Cerrar Sesión</a>
+                <a class="link is-info" href="CerrarSesion.html">Cerrar Sesión</a>
             </p>
         </nav>
     </div>
     <div class="container">
         <br>
         <h2 class="title is-3">Publicar documento</h2>
-        <form action="" id="form-subir">
-            <div class="field">
-                <label class="label">Documento</label>
-            </div>
-            <div id="file-js-example" class="file has-name">
-                <label class="file-label">
-                  <input class="file-input" type="file" name="archivo" required>
-                  <span class="file-cta">
-                    <span class="file-label">
-                    Escoge un archivo
-                    </span>
-                  </span>
-                  <span class="file-name">
-                    No hay archivo seleccionado
-                  </span>
-                </label>
-            </div>
+        <p>Documento:</p>
+        <br>
+        <form action="/PublicarDocumento.html" method="POST" enctype="multipart/form-data">
+            <label>Título: </label>
+            <input type="text" name="titulo" size="50px">
             <br>
-            <div class="barra">
-                <div class="barra_azul" id="barra_estado">
-                    <span></span>
-                </div>
-            </div>
             <br>
-            <div class="buttons">
-                <input type="submit" class="button is-primary" value="Publicar">
-                <input type="button" class="button is-danger" value="Cancelar">
-              </div>
+            <label>Idioma: </label>
+            <select name="idioma">
+                <option value="Español">Español</option>
+                <option value="English">English</option>
+                <option value="Portuguese">Portuguese</option>
+                <option value="Français">Français</option>
+            </select>
+            <br>
+            <br>
+            <label>Seleccione el archivo: </label>
+            <br>
+            <input type="file" name="archivo" value="Seleccionar archivo">
+            <br>
+            <br>
+            <label>Palabras clave: </label>
+            <input type="text" name="palabras" size="100px">
+            <br>
+            <label>Nota: Solo subir documentos en formato pdf, las palabras deben ir separadas por comas y en
+                singular</label>
+            <br>
+            <br>
+            <input type="submit" value="Publicar documento">
+            <br>
+            <br>
+            <label>{{mensaje}}</label>
+
         </form>
     </div>
-    <script src="js/subir.js"></script>
-    <script>
-        const fileInput = document.querySelector('#file-js-example input[type=file]');
-        fileInput.onchange = () => {
-          if (fileInput.files.length > 0) {
-            const fileName = document.querySelector('#file-js-example .file-name');
-            fileName.textContent = fileInput.files[0].name;
-          }
-        }
-    </script>
 </body>
+
 </html>

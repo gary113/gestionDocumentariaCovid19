@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
     <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
 </head>
+
 <body>
     <div class="container">
         <nav class="level -item">
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuPrincipal.html">Menu Principal</a>
+                <a class="link is-info" href="MenuPrincipal.html">Inicio</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuInicioUser.html">Inicio</a>
+                <a class="link is-info" href="MenuInicioUser.html">Menú principal</a>
             </p>
             <p class="level-item has-text-centered">
                 <a class="link is-info" href="Buscador.html">Buscar Documentos</a>
@@ -22,43 +24,40 @@
                 <a class="link is-info" href="SubirDocumento.html">Subir Documentos</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="IniciarSesion.html">Cerrar Sesión</a>
+                <a class="link is-info" href="CerrarSesion.html">Cerrar Sesión</a>
             </p>
         </nav>
     </div>
     <div class="container">
         <br>
         <br>
-        <h1 class="title is-1">¡Bienvenido!</h1>
-        <h2>Documentos recuperados anteriormente</h2>
-        <br>
-        <table class="table">
-            <thead>
+        <h1 class="title is-1">¡Bienvenido {{name}}!</h1>
+        <h2>Documentos subidos</h2>
+        <form action="/MenuInicioUser.html" method="POST" enctype="multipart/form-data">
+            <table class="table">
                 <tr>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>Año</th>
-                    <th>Institución</th>
-                    <th>Enlace de descarga</th>
+                    <td>Titulo</td>
+                    <td>Fecha de subida</td>
+                    <td>Idioma</td>
+                    <td>Estado</td>
+                    <td>Descarga</td>
+                    <td>Obervaciones</td>
+                    <td>Eliminar</td>
                 </tr>
-            </thead>
-            <tbody>
+                {% for item in documentos: %}
                 <tr>
-                    <td>Título 1</td>
-                    <td>Autor 1</td>
-                    <td>Año 1</td>
-                    <td>Institución 1</td>
-                    <td><a href="TerminosyCondiciones.html">Enlace de descarga 1</a></td>
+                    <td>{{item['TITULO_DOCUMENTO']}}</td>
+                    <td>{{item['FECHA_SUBIDA']}}</td>
+                    <td>{{item['IDIOMA_DOCUMENTO']}}</td>
+                    <td>{{item['ESTADO_DOCUMENTO']}}</td>
+                    <td><a href={{item['RUTA_DOCUMENTO']}}>Descargar</a></td>
+                    <td>{{item['OBSERVACIONES_DOCUMENTO']}}</td>
+                    <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Eliminar"></td>
                 </tr>
-                <tr>
-                    <td>Título 2</td>
-                    <td>Autor 2</td>
-                    <td>Año 2</td>
-                    <td>Institución 2</td>
-                    <td><a href="TerminosyCondiciones.html">Enlace de descarga 2</a></td>
-                </tr>
-            </tbody>
-        </table>
+                {% endfor %}
+            </table>
+        </form>
     </div>
 </body>
+
 </html>
