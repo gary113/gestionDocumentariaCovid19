@@ -12,30 +12,50 @@
     <div class="container">
         <nav class="level -item">
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuPrincipal.html">Menu Principal</a>
+                <a class="link is-info" href="MenuPrincipal.html">Inicio</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="MenuInicioOrg.html">Inicio</a>
+                <a class="link is-info" href="MenuInicioOrg.html">Menu principal</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="PublicarDocumento.html">Publicar Documentos</a>
+                <a class="link is-info" href="PublicarDocumento.html">Publicar documentos</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="ValidarDocumento.html">Validar Documentos</a>
+                <a class="link is-info" href="ValidarDocumento.html">Validar documentos</a>
             </p>
             <p class="level-item has-text-centered">
-                <a class="link is-info" href="CerrarSesion.html">Cerrar Sesión</a>
+                <a class="link is-info" href="CerrarSesion.html">Cerrar sesión</a>
             </p>
         </nav>
     </div>
     <div class="container">
         <br>
+        <h2 class="title is-2">Documentos pendientes de validación</h2>
         <br>
-        <h2 class="title is-3">Aviso</h2>
-        <p>¿Desea aceptar este documento?</p>
-        <br>
-        <button class="button">Aceptar</button>
-        <button class="button">Rechazar</button>
+    </div>
+    <div class="container">
+        <form action="/ValidarDocumento.html" method="POST" enctype="multipart/form-data">
+            <table class="table">
+                <tr>
+                    <td>Titulo</td>
+                    <td>Fecha de subida</td>
+                    <td>Idioma</td>
+                    <td>Observaciones</td>
+                    <td>Revisar</td>
+                    <td>Validar</td>
+                </tr>
+                {% for item in documentos: %}
+                <tr>
+                    <td>{{item['TITULO_DOCUMENTO']}}</td>
+                    <td>{{item['FECHA_SUBIDA']}}</td>
+                    <td>{{item['IDIOMA_DOCUMENTO']}}</td>
+                    <td>{{item['OBSERVACIONES_DOCUMENTO']}}</td>
+                    <td><a href={{item['RUTA_DOCUMENTO']}}>Descargar</a></td>
+                    <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Validar"></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </form>
     </div>
 </body>
 

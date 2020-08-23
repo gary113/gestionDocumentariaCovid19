@@ -78,9 +78,11 @@ def subir():
                     'INSERT INTO DOCUMENTO_POR_PALABRA VALUES (%s,%s);', (cod_documento, cod_palabra))
                 connection.commit()
 
+            cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+            documentosSubidos = cursor.fetchall()
             connection.close()
 
-            return render_template('MenuInicioUser.html', name=session['nombre_usuario'])
+            return render_template('MenuInicioUser.html', name=session['nombre_usuario'], documentos=documentosSubidos)
 
         elif filename[-4:] != '.pdf':
             return render_template('SubirDocumento.html', mensaje='Debe subir un documento pdf')
@@ -108,7 +110,7 @@ def buscar():
 
         if request.method == 'POST':
             textoBuscar = request.form['textoBuscar']
-            cursor.execute('SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO IN (SELECT DOCUMENTO_COD_DOCUMENTO FROM DOCUMENTO_POR_PALABRA WHERE PALABRAS_CLAVE_COD_PALABRA=(SELECT COD_PALABRA FROM PALABRAS_CLAVE WHERE PALABRA=%s) );', textoBuscar)
+            cursor.execute('SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO IN (SELECT DOCUMENTO_COD_DOCUMENTO FROM DOCUMENTO_POR_PALABRA WHERE PALABRAS_CLAVE_COD_PALABRA=(SELECT COD_PALABRA FROM PALABRAS_CLAVE WHERE PALABRA=%s) AND ESTADO_DOCUMENTO="val" );', textoBuscar)
             documentosEncontrados = cursor.fetchall()
 
             return render_template('Buscador.html', documentos=documentosEncontrados)
@@ -138,27 +140,106 @@ def login():
             session['codigo_usuario'] = user['COD_USUARIO']
             session['nombre_usuario'] = user['NOMBRE_USUARIO']
             session['tipo_usuario'] = user['TIPO_USUARIO']
-            connection.close()
 
             if session['tipo_usuario'] == 'adm':
-                return render_template('MenuInicioOrg.html', name=session['nombre_usuario'])
+                cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+                documentosSubidos = cursor.fetchall()
+                connection.close()
+                return render_template('MenuInicioOrg.html', name=session['nombre_usuario'], documentos=documentosSubidos)
             else:
-                return render_template('MenuInicioUser.html', name=session['nombre_usuario'])
+                cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+                documentosSubidos = cursor.fetchall()
+                connection.close()
+                return render_template('MenuInicioUser.html', name=session['nombre_usuario'], documentos=documentosSubidos)
 
     else:
 
         if not session:
             return render_template('IniciarSesion.html')
         else:
+            connection = pymysql.connect(host='localhost',
+                                         user='root',
+                                         password='linux321',
+                                         db='BD_PAGINA',
+                                         charset='utf8mb4',
+                                         cursorclass=pymysql.cursors.DictCursor)
+            cursor = connection.cursor()
+
             if session['tipo_usuario'] == 'adm':
-                return render_template('MenuInicioOrg.html', name=session['nombre_usuario'])
+                cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+                documentosSubidos = cursor.fetchall()
+                connection.close()
+                return render_template('MenuInicioOrg.html', name=session['nombre_usuario'], documentos=documentosSubidos)
             else:
-                return render_template('MenuInicioUser.html', name=session['nombre_usuario'])
+                cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+                documentosSubidos = cursor.fetchall()
+                connection.close()
+                return render_template('MenuInicioUser.html', name=session['nombre_usuario'], documentos=documentosSubidos)
 
 
-@app.route("/ValidarDocumento.html")
+@app.route("/ValidarDocumento.html", methods=['GET', 'POST'])
 def validar():
-    return render_template('ValidarDocumento.html')
+
+    if not session:
+        return render_template('MenuPrincipal.html')
+    else:
+        connection = pymysql.connect(host='localhost',
+                                     user='root',
+                                     password='linux321',
+                                     db='BD_PAGINA',
+                                     charset='utf8mb4',
+                                     cursorclass=pymysql.cursors.DictCursor)
+        cursor = connection.cursor()
+
+        if request.method == 'POST':
+            codValidar = str(list(request.form.keys())[0])
+            cursor.execute('SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codValidar)
+            documentoValidar = cursor.fetchone()
+            connection.close()
+            return render_template('DetalleValidar.html', documento=documentoValidar)
+        else:
+            cursor.execute('SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="esp";')
+            documentosSubidos = cursor.fetchall()
+            connection.close()
+            return render_template('ValidarDocumento.html', documentos=documentosSubidos)
+
+
+@app.route("/DetalleValidar.html", methods=['GET', 'POST'])
+def detalleValidar():
+
+    if not session:
+        return render_template('MenuPrincipal.html')
+    else:
+        connection = pymysql.connect(host='localhost',
+                                     user='root',
+                                     password='linux321',
+                                     db='BD_PAGINA',
+                                     charset='utf8mb4',
+                                     cursorclass=pymysql.cursors.DictCursor)
+        cursor = connection.cursor()
+
+        if request.method == 'POST':
+            codValidar = str(list(request.form.keys())[1])
+            accionValidar = request.form[str(codValidar)]
+            observaciones = request.form['observaciones']
+
+            if accionValidar == 'Rechazar':
+                nuevoEstado = 'rec'
+            elif accionValidar == 'Observar':
+                nuevoEstado = 'obs'
+            else:
+                nuevoEstado = 'val'
+
+            cursor.execute('UPDATE DOCUMENTO SET ESTADO_DOCUMENTO=%s, OBSERVACIONES_DOCUMENTO=%s WHERE COD_DOCUMENTO=%s',
+                           (nuevoEstado, observaciones, codValidar))
+            connection.commit()
+            connection.close()
+            return render_template('ValidarDocumento.html')
+
+        else:
+            return render_template('DetalleValidar.html')
+
+    return render_template('DetalleValidar.html')
 
 
 @app.route("/Documentos.html")  # ver para que sirve
@@ -171,12 +252,29 @@ def desplegar():
     return render_template('MenuPrincipal.html')
 
 
-@app.route("/MenuInicioOrg.html", methods=['GET'])
+@app.route("/MenuInicioOrg.html", methods=['GET', 'POST'])
 def desplegar2():
     if not session:
         return render_template('MenuPrincipal.html')
     else:
-        return render_template('MenuInicioOrg.html', name=session['nombre_usuario'])
+        connection = pymysql.connect(host='localhost',
+                                     user='root',
+                                     password='linux321',
+                                     db='BD_PAGINA',
+                                     charset='utf8mb4',
+                                     cursorclass=pymysql.cursors.DictCursor)
+        cursor = connection.cursor()
+
+        if request.method == 'POST':
+            codBorrar = str(list(request.form.keys())[0])
+            cursor.execute('DELETE FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codBorrar)
+            connection.commit()
+
+        cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+        documentosSubidos = cursor.fetchall()
+        connection.close()
+
+        return render_template('MenuInicioOrg.html', name=session['nombre_usuario'], documentos=documentosSubidos)
 
 
 @app.route("/MenuInicioUser.html", methods=['GET', 'POST'])
@@ -200,6 +298,7 @@ def desplegar3():
 
         cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
         documentosSubidos = cursor.fetchall()
+        connection.close()
 
         return render_template('MenuInicioUser.html', name=session['nombre_usuario'], documentos=documentosSubidos)
 
@@ -212,10 +311,10 @@ def publicar():
         TITULO = request.form['titulo']
         FECHA = date.today()
         IDIOMA = request.form['idioma']
-        VALIDADO = 1
+        ESTADO = 'val'
 
         CODIGO_USUARIO = session['codigo_usuario']
-        PALABRAS = request.form['palabras'].split(',')
+        PALABRAS = request.form['palabras'].replace(' ', '').lower().split(',')
 
         if TITULO != '' and filename[-4:] == '.pdf' and PALABRAS != '':
             fechaHora = datetime.now()
@@ -231,7 +330,7 @@ def publicar():
                                          cursorclass=pymysql.cursors.DictCursor)
             cursor = connection.cursor()
 
-            cursor.execute('INSERT INTO DOCUMENTO VALUES (NULL,%s,%s,%s,%s,%s,%s);', (TITULO, RUTA, FECHA, IDIOMA, VALIDADO, CODIGO_USUARIO))
+            cursor.execute('INSERT INTO DOCUMENTO VALUES (NULL,%s,%s,%s,%s,%s,%s,%s);', (TITULO, FECHA, IDIOMA, ESTADO, RUTA, '-', CODIGO_USUARIO))
             cursor.execute('SELECT COD_DOCUMENTO FROM DOCUMENTO ORDER BY COD_DOCUMENTO DESC LIMIT 1;')
             cod_documento = cursor.fetchone()['COD_DOCUMENTO']
             connection.commit()
@@ -240,7 +339,7 @@ def publicar():
                 cursor.execute('SELECT * FROM PALABRAS_CLAVE WHERE PALABRA=%s;', palabra)
                 palabra_clave = cursor.fetchone()
                 if palabra_clave is None:
-                    cursor.execute('INSERT INTO PALABRAS_CLAVE VALUES (NULL,%s);', (palabra))
+                    cursor.execute('INSERT INTO PALABRAS_CLAVE VALUES (NULL,%s);', palabra)
                     connection.commit()
 
             for palabra in PALABRAS:
@@ -250,9 +349,11 @@ def publicar():
                     'INSERT INTO DOCUMENTO_POR_PALABRA VALUES (%s,%s);', (cod_documento, cod_palabra))
                 connection.commit()
 
+            cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+            documentosSubidos = cursor.fetchall()
             connection.close()
 
-            return render_template('MenuInicioOrg.html', name=session['nombre_usuario'])
+            return render_template('MenuInicioOrg.html', name=session['nombre_usuario'], documentos=documentosSubidos)
 
         elif filename[-4:] != '.pdf':
             return render_template('PublicarDocumento.html', mensaje='Debe subir un documento pdf')
@@ -268,6 +369,12 @@ def publicar():
 def cerrarSesion():
     session.clear()
     return render_template('MenuPrincipal.html')
+
+
+@app.route('/archivos/<path:filename>', methods=['GET'])
+def descargar(filename):
+    uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
+    return send_from_directory(directory=uploads, filename=filename)
 
 
 if __name__ == '__main__':

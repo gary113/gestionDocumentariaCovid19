@@ -31,27 +31,20 @@
     <div class="container">
         <br>
         <br>
-        <h1 class="title is-1">¡Bienvenido {{name}}!</h1>
-        <p>Documentos publicados anteriormente</p>
+        <h1 class="title is-1">Validación de documento</h1>
+        <p>Documento a validar: {{ documento['TITULO_DOCUMENTO'] }}</p>
         <br>
-        <table class="table">
-            <tr>
-                <td>Titulo</td>
-                <td>Fecha de subida</td>
-                <td>Idioma</td>
-                <td>Descarga</td>
-                <td>Eliminar</td>
-            </tr>
-            {% for item in documentos: %}
-            <tr>
-                <td>{{item['TITULO_DOCUMENTO']}}</td>
-                <td>{{item['FECHA_SUBIDA']}}</td>
-                <td>{{item['IDIOMA_DOCUMENTO']}}</td>
-                <td><a href={{item['RUTA_DOCUMENTO']}}>Descargar</a></td>
-                <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Eliminar"></td>
-            </tr>
-            {% endfor %}
-        </table>
+        <form action="/DetalleValidar.html" method="POST" enctype="multipart/form-data">
+            <label>Observaciones:</label>
+            <br>
+            <br>
+            <textarea name="observaciones" rows="4" cols="100">-</textarea>
+            <br>
+            <br>
+            <input type="submit" name={{documento['COD_DOCUMENTO']}} value="Rechazar"><input type="submit"
+                name={{documento['COD_DOCUMENTO']}} value="Observar"><input type="submit"
+                name={{documento['COD_DOCUMENTO']}} value="Validar">
+        </form>
     </div>
 </body>
 
