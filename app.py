@@ -25,9 +25,9 @@ def subir():
         IDIOMA = request.form['idioma']
 
         if session['tipo_usuario'] == 'adm':
-            ESTADO = 'val'
+            ESTADO = 'Validado'
         else:
-            ESTADO = 'esp'
+            ESTADO = 'En espera'
 
         CODIGO_USUARIO = session['codigo_usuario']
         PALABRAS = request.form['palabras'].replace(' ', '').lower().split(',')
@@ -116,7 +116,7 @@ def buscar():
             documentosEncontrados = list()
             for palabra in palabras:
                 cursor.execute(
-                    'SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO IN (SELECT DOCUMENTO_COD_DOCUMENTO FROM DOCUMENTO_POR_PALABRA WHERE PALABRAS_CLAVE_COD_PALABRA=(SELECT COD_PALABRA FROM PALABRAS_CLAVE WHERE PALABRA=%s) AND ESTADO_DOCUMENTO="val" );', palabra)
+                    'SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO IN (SELECT DOCUMENTO_COD_DOCUMENTO FROM DOCUMENTO_POR_PALABRA WHERE PALABRAS_CLAVE_COD_PALABRA=(SELECT COD_PALABRA FROM PALABRAS_CLAVE WHERE PALABRA=%s) AND ESTADO_DOCUMENTO="Validado" );', palabra)
                 encontrados = cursor.fetchall()
                 for encontrado in encontrados:
                     if encontrado not in documentosEncontrados:
@@ -208,7 +208,7 @@ def validar():
             connection.close()
             return render_template('DetalleValidar.html', documento=documentoValidar)
         else:
-            cursor.execute('SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="esp";')
+            cursor.execute('SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="En espera";')
             documentosPendientes = cursor.fetchall()
             connection.close()
             return render_template('ValidarDocumento.html', documentos=documentosPendientes)
@@ -234,17 +234,17 @@ def detalleValidar():
             observaciones = request.form['observaciones']
 
             if accionValidar == 'Rechazar':
-                nuevoEstado = 'rec'
+                nuevoEstado = 'Rechazado'
             elif accionValidar == 'Observar':
-                nuevoEstado = 'obs'
+                nuevoEstado = 'Observado'
             else:
-                nuevoEstado = 'val'
+                nuevoEstado = 'Validado'
 
             cursor.execute('UPDATE DOCUMENTO SET ESTADO_DOCUMENTO=%s, OBSERVACIONES_DOCUMENTO=%s WHERE COD_DOCUMENTO=%s',
                            (nuevoEstado, observaciones, codValidar))
             connection.commit()
 
-            cursor.execute('SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="esp";')
+            cursor.execute('SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="En espera";')
             documentosPendientes = cursor.fetchall()
             connection.close()
             return render_template('ValidarDocumento.html', documentos=documentosPendientes)
@@ -327,7 +327,7 @@ def corregir():
         TITULO = str(request.form['titulo'])
         FECHA = date.today()
         IDIOMA = request.form['idioma']
-        ESTADO = 'esp'
+        ESTADO = 'En espera'
         CODIGO_USUARIO = session['codigo_usuario']
 
         connection = pymysql.connect(host='localhost',

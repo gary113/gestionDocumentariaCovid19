@@ -1,0 +1,143 @@
+-- MySQL dump 10.13  Distrib 8.0.21, for Linux (x86_64)
+--
+-- Host: localhost    Database: BD_PAGINA
+-- ------------------------------------------------------
+-- Server version	8.0.21-0ubuntu0.20.04.4
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `DOCUMENTO`
+--
+
+CREATE DATABASE BD_PAGINA;
+
+USE BD_PAGINA;
+
+DROP TABLE IF EXISTS `DOCUMENTO`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `DOCUMENTO` (
+  `COD_DOCUMENTO` int NOT NULL AUTO_INCREMENT,
+  `TITULO_DOCUMENTO` varchar(100) NOT NULL,
+  `FECHA_SUBIDA` date NOT NULL,
+  `IDIOMA_DOCUMENTO` varchar(30) NOT NULL,
+  `ESTADO_DOCUMENTO` varchar(10) NOT NULL,
+  `RUTA_DOCUMENTO` varchar(100) NOT NULL,
+  `OBSERVACIONES_DOCUMENTO` varchar(100) DEFAULT NULL,
+  `USUARIO_COD_USUARIO` int NOT NULL,
+  PRIMARY KEY (`COD_DOCUMENTO`,`USUARIO_COD_USUARIO`),
+  KEY `fk_DOCUMENTO_USUARIO1_idx` (`USUARIO_COD_USUARIO`),
+  CONSTRAINT `fk_DOCUMENTO_USUARIO1` FOREIGN KEY (`USUARIO_COD_USUARIO`) REFERENCES `USUARIO` (`COD_USUARIO`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `DOCUMENTO`
+--
+
+LOCK TABLES `DOCUMENTO` WRITE;
+/*!40000 ALTER TABLE `DOCUMENTO` DISABLE KEYS */;
+INSERT INTO `DOCUMENTO` VALUES (1,'Investigación de mercados','2020-08-23','Español','En espera','./archivos/23-08-2020_21-06-55-680868_Investigacion_de_mercados.pdf','Corregir el título por favor',1),(2,'Distribución de costos','2020-08-23','Español','En espera','./archivos/23-08-2020_21-00-17-679457_Distribucion_costos.pdf','-',1),(3,'Lab practice','2020-08-23','English','Validado','./archivos/23-08-2020_21-02-48-155084_Lab_practice.pdf','',1),(4,'Costeo investigación COVID19','2020-08-23','Español','En espera','./archivos/23-08-2020_21-03-23-565376_Costeo_investigacion_COVID_19.pdf','-',1),(5,'Simulación de virus','2020-08-23','Español','Validado','./archivos/23-08-2020_21-04-18-990651_Simulacion_virus.pdf','-',2);
+/*!40000 ALTER TABLE `DOCUMENTO` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `DOCUMENTO_POR_PALABRA`
+--
+
+DROP TABLE IF EXISTS `DOCUMENTO_POR_PALABRA`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `DOCUMENTO_POR_PALABRA` (
+  `DOCUMENTO_COD_DOCUMENTO` int NOT NULL,
+  `PALABRAS_CLAVE_COD_PALABRA` int NOT NULL,
+  KEY `fk_DOCUMENTO_POR_PALABRA_DOCUMENTO1_idx` (`DOCUMENTO_COD_DOCUMENTO`),
+  KEY `fk_DOCUMENTO_POR_PALABRA_PALABRAS_CLAVE1_idx` (`PALABRAS_CLAVE_COD_PALABRA`),
+  CONSTRAINT `fk_DOCUMENTO_POR_PALABRA_DOCUMENTO1` FOREIGN KEY (`DOCUMENTO_COD_DOCUMENTO`) REFERENCES `DOCUMENTO` (`COD_DOCUMENTO`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_DOCUMENTO_POR_PALABRA_PALABRAS_CLAVE1` FOREIGN KEY (`PALABRAS_CLAVE_COD_PALABRA`) REFERENCES `PALABRAS_CLAVE` (`COD_PALABRA`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `DOCUMENTO_POR_PALABRA`
+--
+
+LOCK TABLES `DOCUMENTO_POR_PALABRA` WRITE;
+/*!40000 ALTER TABLE `DOCUMENTO_POR_PALABRA` DISABLE KEYS */;
+INSERT INTO `DOCUMENTO_POR_PALABRA` VALUES (1,1),(1,2),(1,3),(1,4),(2,5),(2,6),(2,7),(3,8),(3,9),(3,7),(4,5),(4,6),(4,7),(5,7),(5,10);
+/*!40000 ALTER TABLE `DOCUMENTO_POR_PALABRA` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `PALABRAS_CLAVE`
+--
+
+DROP TABLE IF EXISTS `PALABRAS_CLAVE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `PALABRAS_CLAVE` (
+  `COD_PALABRA` int NOT NULL AUTO_INCREMENT,
+  `PALABRA` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`COD_PALABRA`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `PALABRAS_CLAVE`
+--
+
+LOCK TABLES `PALABRAS_CLAVE` WRITE;
+/*!40000 ALTER TABLE `PALABRAS_CLAVE` DISABLE KEYS */;
+INSERT INTO `PALABRAS_CLAVE` VALUES (1,'investigación'),(2,'mercado'),(3,'mercadotecnia'),(4,'uni'),(5,'costo'),(6,'virus'),(7,'covid19'),(8,'lab'),(9,'practice'),(10,'simulación');
+/*!40000 ALTER TABLE `PALABRAS_CLAVE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USUARIO`
+--
+
+DROP TABLE IF EXISTS `USUARIO`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USUARIO` (
+  `COD_USUARIO` int NOT NULL AUTO_INCREMENT,
+  `NOMBRE_USUARIO` varchar(45) NOT NULL,
+  `APELLIDOS_USUARIO` varchar(45) NOT NULL,
+  `CORREO_USUARIO` varchar(30) NOT NULL,
+  `PASSWORD_USUARIO` varchar(20) NOT NULL,
+  `TIPO_USUARIO` varchar(15) NOT NULL,
+  `ORG_USUARIO` varchar(45) NOT NULL,
+  PRIMARY KEY (`COD_USUARIO`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USUARIO`
+--
+
+LOCK TABLES `USUARIO` WRITE;
+/*!40000 ALTER TABLE `USUARIO` DISABLE KEYS */;
+INSERT INTO `USUARIO` VALUES (1,'Leonardo','Zambrano','leonardo.zambrano@uni.pe','qwerty','inv','UNI'),(2,'Gary','Candia','gary.candia@uni.pe','qwerty','adm','UNI');
+/*!40000 ALTER TABLE `USUARIO` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2020-08-23 21:09:22
