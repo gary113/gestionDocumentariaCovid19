@@ -8,11 +8,14 @@ import time
 app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = "./archivos"  # directorio de la carpeta donde estan los archivos
+app.config['SRC_FOLDER'] = '/static/src'  # imágenes
 
 
 @app.route("/")
+@app.route("/MenuPrincipal.html")
 def welcome():
-    return redirect('MenuPrincipal.html')
+    img = os.path.join(app.config['SRC_FOLDER'], 'indice.jpeg')
+    return render_template('MenuPrincipal.html', imagen=img)
 
 
 @app.route("/SubirDocumento.html", methods=['GET', 'POST'])
@@ -255,11 +258,6 @@ def detalleValidar():
     return render_template('DetalleValidar.html')
 
 
-@app.route("/MenuPrincipal.html")
-def desplegar():
-    return render_template('MenuPrincipal.html')
-
-
 @app.route("/MenuInicioOrg.html", methods=['GET', 'POST'])
 def desplegar2():
     if not session:
@@ -275,7 +273,10 @@ def desplegar2():
 
         if request.method == 'POST':
             codBorrar = str(list(request.form.keys())[0])
+            cursor.execute('SELECT RUTA_DOCUMENTO FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codBorrar)
+            archivoEliminar = str(cursor.fetchone()['RUTA_DOCUMENTO'])[2:]
             cursor.execute('DELETE FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codBorrar)
+            os.remove(os.path.join(current_app.root_path, archivoEliminar))
             connection.commit()
 
         cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
@@ -304,8 +305,12 @@ def desplegar3():
             accion = request.form[codDocumento]
 
             if accion == 'Eliminar':
+                cursor.execute('SELECT RUTA_DOCUMENTO FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
+                archivoEliminar = str(cursor.fetchone()['RUTA_DOCUMENTO'])[2:]
                 cursor.execute('DELETE FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
+                os.remove(os.path.join(current_app.root_path, archivoEliminar))
                 connection.commit()
+
             else:
                 cursor.execute('SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
                 documentoCorregir = cursor.fetchone()
@@ -318,7 +323,7 @@ def desplegar3():
         return render_template('MenuInicioUser.html', name=session['nombre_usuario'], documentos=documentosSubidos)
 
 
-@app.route("/CorregirDocumento.html", methods=['POST', 'GET'])
+@ app.route("/CorregirDocumento.html", methods=['POST', 'GET'])
 def corregir():
 
     if request.method == "POST":
@@ -348,7 +353,7 @@ def corregir():
 
             RUTA = "./archivos/"+str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)
 
-            #codDocumento = str(list(request.form.keys())[0])
+            # codDocumento = str(list(request.form.keys())[0])
 
             cursor.execute('UPDATE DOCUMENTO SET TITULO_DOCUMENTO = %s, FECHA_SUBIDA = %s, IDIOMA_DOCUMENTO= %s, ESTADO_DOCUMENTO=%s, RUTA_DOCUMENTO=%s WHERE COD_DOCUMENTO=%s;',
                            (TITULO, FECHA, IDIOMA, ESTADO, RUTA, codDocumento))
@@ -375,15 +380,21 @@ def publicar():
 @ app.route("/CerrarSesion.html", methods=['GET'])
 def cerrarSesion():
     session.clear()
-    return render_template('MenuPrincipal.html')
+    return welcome()
 
 
 @ app.route('/archivos/<path:filename>', methods=['GET'])
 def descargar(filename):
     uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
-    return send_from_directory(directory=uploads, filename=filename)
+    return send_from_directory(directory=uploads, filename=filename, as_attachment=True)
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 if __name__ == '__main__':
     app.secret_key = 'helloworld'
-    app.run(debug=True)
+    app.run(debug=False)
+    #app.add_url_rule('/favicon.ico', redirect_to=url_for('static', filename='favicon.ico'))

@@ -42,15 +42,6 @@ CREATE TABLE `DOCUMENTO` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `DOCUMENTO`
---
-
-LOCK TABLES `DOCUMENTO` WRITE;
-/*!40000 ALTER TABLE `DOCUMENTO` DISABLE KEYS */;
-INSERT INTO `DOCUMENTO` VALUES (1,'Investigación de mercados','2020-08-23','Español','En espera','./archivos/23-08-2020_21-06-55-680868_Investigacion_de_mercados.pdf','Corregir el título por favor',1),(2,'Distribución de costos','2020-08-23','Español','En espera','./archivos/23-08-2020_21-00-17-679457_Distribucion_costos.pdf','-',1),(3,'Lab practice','2020-08-23','English','Validado','./archivos/23-08-2020_21-02-48-155084_Lab_practice.pdf','',1),(4,'Costeo investigación COVID19','2020-08-23','Español','En espera','./archivos/23-08-2020_21-03-23-565376_Costeo_investigacion_COVID_19.pdf','-',1),(5,'Simulación de virus','2020-08-23','Español','Validado','./archivos/23-08-2020_21-04-18-990651_Simulacion_virus.pdf','-',2);
-/*!40000 ALTER TABLE `DOCUMENTO` ENABLE KEYS */;
-UNLOCK TABLES;
-
 --
 -- Table structure for table `DOCUMENTO_POR_PALABRA`
 --
@@ -68,19 +59,7 @@ CREATE TABLE `DOCUMENTO_POR_PALABRA` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `DOCUMENTO_POR_PALABRA`
---
 
-LOCK TABLES `DOCUMENTO_POR_PALABRA` WRITE;
-/*!40000 ALTER TABLE `DOCUMENTO_POR_PALABRA` DISABLE KEYS */;
-INSERT INTO `DOCUMENTO_POR_PALABRA` VALUES (1,1),(1,2),(1,3),(1,4),(2,5),(2,6),(2,7),(3,8),(3,9),(3,7),(4,5),(4,6),(4,7),(5,7),(5,10);
-/*!40000 ALTER TABLE `DOCUMENTO_POR_PALABRA` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `PALABRAS_CLAVE`
---
 
 DROP TABLE IF EXISTS `PALABRAS_CLAVE`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -93,18 +72,8 @@ CREATE TABLE `PALABRAS_CLAVE` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `PALABRAS_CLAVE`
 --
 
-LOCK TABLES `PALABRAS_CLAVE` WRITE;
-/*!40000 ALTER TABLE `PALABRAS_CLAVE` DISABLE KEYS */;
-INSERT INTO `PALABRAS_CLAVE` VALUES (1,'investigación'),(2,'mercado'),(3,'mercadotecnia'),(4,'uni'),(5,'costo'),(6,'virus'),(7,'covid19'),(8,'lab'),(9,'practice'),(10,'simulación');
-/*!40000 ALTER TABLE `PALABRAS_CLAVE` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `USUARIO`
---
 
 DROP TABLE IF EXISTS `USUARIO`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
