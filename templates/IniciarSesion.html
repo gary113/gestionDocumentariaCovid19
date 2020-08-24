@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
-    <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
+    <link rel="stylesheet" href="../static/assets/bulma/css/bulma.min.css">
 </head>
 <body>
     <div class="container">
@@ -14,20 +14,21 @@
             </p>
         </nav>
     </div>
-    <form action="/IniciarSesion.html" method="POST">
-        <div class="form-group">
-            <br>
-            <br>
-            <h1 class="title is-1">Iniciar Sesión</h1>
-            <h4>Usuario</h4>
-            <input class="input" type="text" name="email" placeholder="Usuario"><br><br>
-            <h4>Contraseña</h4>
-            <input class="input" type="password" name="password" placeholder="Contraseña"><br><br>
-            <button type="submit" class="button">Ingresar</button>
-            <br>
-            <br>
-            <h3>¿No está registrado? <a>Registrarse</a></h3>
-        </div>
-    </form>
+    <div class = "container">
+        <form action="/IniciarSesion.html" method="POST">
+            <div class="form-group">
+                <br>
+                <br>
+                <h1 class="title is-1">Iniciar Sesión</h1>
+                <h4>Usuario</h4>
+                <input class="input" type="text" name="email" placeholder="Usuario"><br><br>
+                <h4>Contraseña</h4>
+                <input class="input" type="password" name="password" placeholder="Contraseña"><br><br>
+                <button type="submit" class="button">Ingresar</button>
+                <br>
+                <br>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

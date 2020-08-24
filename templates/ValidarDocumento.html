@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
-    <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
+    <link rel="stylesheet" href="../static/assets/bulma/css/bulma.min.css">
 </head>
 
 <body>
@@ -50,8 +50,11 @@
                     <td>{{item['FECHA_SUBIDA']}}</td>
                     <td>{{item['IDIOMA_DOCUMENTO']}}</td>
                     <td>{{item['OBSERVACIONES_DOCUMENTO']}}</td>
-                    <td><a href={{item['RUTA_DOCUMENTO']}}>Descargar</a></td>
-                    <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Validar"></td>
+                    <td><button class="button is-link is-light">
+                            <a href={{item['RUTA_DOCUMENTO']}}>Descargar</a>
+                        </button></td>
+                    <td><input class="input is-primary" type="submit" name={{item['COD_DOCUMENTO']}} value="Validar">
+                    </td>
                 </tr>
                 {% endfor %}
             </table>

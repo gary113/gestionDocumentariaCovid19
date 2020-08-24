@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
-    <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
+    <link rel="stylesheet" href="../static/assets/bulma/css/bulma.min.css">
 </head>
 
 <body>
@@ -31,35 +31,37 @@
     <div class="container">
         <br>
         <h2 class="title is-3">Publicar documento</h2>
-        <p>Documento:</p>
         <br>
         <form action="/PublicarDocumento.html" method="POST" enctype="multipart/form-data">
-            <label>Título: </label>
-            <input type="text" name="titulo" size="50px">
+            <label class="label">Título: </label>
+            <input class="input" type="text" name="titulo" size="50px">
             <br>
             <br>
-            <label>Idioma: </label>
-            <select name="idioma">
-                <option value="Español">Español</option>
-                <option value="English">English</option>
-                <option value="Portuguese">Portuguese</option>
-                <option value="Français">Français</option>
-            </select>
+            <label class="label">Idioma: </label>
+            <span class="select">
+                <select name="idioma">
+                    <option value="Español">Español</option>
+                    <option value="English">English</option>
+                    <option value="Portuguese">Portuguese</option>
+                    <option value="Français">Français</option>
+                </select>
+            </span>
             <br>
             <br>
-            <label>Seleccione el archivo: </label>
+            <label class="label">Archivo: </label>
             <br>
-            <input type="file" name="archivo" value="Seleccionar archivo">
+            <div class="control is-loading">
+                <input type="file" name="archivo" value="Seleccionar archivo">
+            </div>
             <br>
-            <br>
-            <label>Palabras clave: </label>
-            <input type="text" name="palabras" size="100px">
+            <label class="label">Palabras clave: </label>
+            <input class="input" type="text" name="palabras" size="100px">
             <br>
             <label>Nota: Solo subir documentos en formato pdf, las palabras deben ir separadas por comas y en
                 singular</label>
             <br>
             <br>
-            <input type="submit" value="Publicar documento">
+            <input class="input is-primary" type="submit" value="Publicar documento">
             <br>
             <br>
             <label>{{mensaje}}</label>

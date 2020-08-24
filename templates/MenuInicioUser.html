@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión documentaria Covid19</title>
-    <link rel="stylesheet" href="static/assets/bulma/css/bulma.min.css">
+    <link rel="stylesheet" href="../static/assets/bulma/css/bulma.min.css">
 </head>
 
 <body>
@@ -43,6 +43,7 @@
                     <td>Descarga</td>
                     <td>Obervaciones</td>
                     <td>Eliminar</td>
+                    <td>Corregir</td>
                 </tr>
                 {% for item in documentos: %}
                 <tr>
@@ -50,9 +51,18 @@
                     <td>{{item['FECHA_SUBIDA']}}</td>
                     <td>{{item['IDIOMA_DOCUMENTO']}}</td>
                     <td>{{item['ESTADO_DOCUMENTO']}}</td>
-                    <td><a href={{item['RUTA_DOCUMENTO']}}>Descargar</a></td>
+                    <td><button class="button is-link is-light">
+                            <a href={{item['RUTA_DOCUMENTO']}}>Descargar</a>
+                        </button></td>
                     <td>{{item['OBSERVACIONES_DOCUMENTO']}}</td>
                     <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Eliminar"></td>
+
+                    {% if item['ESTADO_DOCUMENTO'] == 'obs' %}
+                    <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Corregir"></td>
+                    {% else %}
+                    <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Corregir" disabled></td>
+                    {% endif %}
+
                 </tr>
                 {% endfor %}
             </table>

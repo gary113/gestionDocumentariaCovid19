@@ -30,17 +30,17 @@
     </div>
     <div class="container">
         <br>
-        <h2 class="title is-3">Subir documento</h2>
+        <h2 class="title is-3">Corregir documento</h2>
         <p>Documento:</p>
         <br>
-        <form action="/SubirDocumento.html" method="POST" enctype="multipart/form-data">
+        <form action="/CorregirDocumento.html" method="POST" enctype="multipart/form-data">
             <label class="label">Título: </label>
-            <input class="input" type="text" name="titulo" size="50px">
+            <input class="input" type="text" name="titulo" size="50px" value="{{documento['TITULO_DOCUMENTO']}}">
             <br>
             <br>
             <label class="label">Idioma: </label>
             <span class="select">
-                <select name="idioma">
+                <select name="idioma" value="{{documento['IDIOMA_DOCUMENTO']}}">
                     <option value="Español">Español</option>
                     <option value="English">English</option>
                     <option value="Portuguese">Portuguese</option>
@@ -56,14 +56,8 @@
             </div>
             <br>
             <br>
-            <label class="label">Palabras clave: </label>
-            <input class="input" type="text" name="palabras" size="100px">
-            <br>
-            <label>Nota: Solo subir documentos en formato pdf, las palabras deben ir separadas por comas y en
-                singular</label>
-            <br>
-            <br>
-            <input class="input is-primary" type="submit" value="Subir documento">
+            <input class="input is-primary" type="submit" name="{{documento['COD_DOCUMENTO']}}"
+                value="Corregir documento">
             <br>
             <br>
             <label>{{mensaje}}</label>
