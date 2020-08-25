@@ -1,14 +1,23 @@
 import os
-from flask import *
-from werkzeug.utils import secure_filename
-from datetime import date, datetime
-import pymysql
 import time
+from datetime import date, datetime
+
+import pymysql
+from flask import (Flask, current_app, render_template, request,
+                   send_from_directory, session)
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-app.config['UPLOAD_FOLDER'] = "./archivos"  # directorio de la carpeta donde estan los archivos
+app.secret_key = 'helloworld'
+
+# directorio de la carpeta donde estan los archivos
+app.config['UPLOAD_FOLDER'] = '/home/gary/Proyectos/Python/gestionDocumentariaCovid19/archivos/'
 app.config['SRC_FOLDER'] = '/static/src'  # imágenes
+
+HOST = 'localhost'
+DB = 'BD_PAGINA'
+USER = 'root'
 
 
 @app.route("/")
@@ -37,38 +46,48 @@ def subir():
 
         if TITULO != '' and filename[-4:] == '.pdf' and PALABRAS[0] != '':
             fechaHora = datetime.now()
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)))
 
-            RUTA = "./archivos/"+str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)
+            #print(os.path.join(app.config['UPLOAD_FOLDER'], str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)))
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(
+                fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)))
 
-            connection = pymysql.connect(host='localhost',
-                                         user='root',
+            RUTA = str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f")) + \
+                "_"+str(filename)
+
+            connection = pymysql.connect(host=HOST,
+                                         user=USER,
                                          password='linux321',
-                                         db='BD_PAGINA',
+                                         db=DB,
                                          charset='utf8mb4',
                                          cursorclass=pymysql.cursors.DictCursor)
             cursor = connection.cursor()
 
-            cursor.execute('INSERT INTO DOCUMENTO VALUES (NULL,%s,%s,%s,%s,%s,%s,%s);', (TITULO, FECHA, IDIOMA, ESTADO, RUTA, '-', CODIGO_USUARIO))
-            cursor.execute('SELECT COD_DOCUMENTO FROM DOCUMENTO ORDER BY COD_DOCUMENTO DESC LIMIT 1;')
+            cursor.execute('INSERT INTO DOCUMENTO VALUES (NULL,%s,%s,%s,%s,%s,%s,%s);',
+                           (TITULO, FECHA, IDIOMA, ESTADO, RUTA, '', CODIGO_USUARIO))
+            cursor.execute(
+                'SELECT COD_DOCUMENTO FROM DOCUMENTO ORDER BY COD_DOCUMENTO DESC LIMIT 1;')
             cod_documento = cursor.fetchone()['COD_DOCUMENTO']
             connection.commit()
 
             for palabra in PALABRAS:
-                cursor.execute('SELECT * FROM PALABRAS_CLAVE WHERE PALABRA=%s;', palabra)
+                cursor.execute(
+                    'SELECT * FROM PALABRAS_CLAVE WHERE PALABRA=%s;', palabra)
                 palabra_clave = cursor.fetchone()
                 if palabra_clave is None:
-                    cursor.execute('INSERT INTO PALABRAS_CLAVE VALUES (NULL,%s);', palabra)
+                    cursor.execute(
+                        'INSERT INTO PALABRAS_CLAVE VALUES (NULL,%s);', palabra)
                     connection.commit()
 
             for palabra in PALABRAS:
-                cursor.execute('SELECT COD_PALABRA FROM PALABRAS_CLAVE WHERE PALABRA =%s;', palabra)
+                cursor.execute(
+                    'SELECT COD_PALABRA FROM PALABRAS_CLAVE WHERE PALABRA =%s;', palabra)
                 cod_palabra = cursor.fetchone()['COD_PALABRA']
                 cursor.execute(
                     'INSERT INTO DOCUMENTO_POR_PALABRA VALUES (%s,%s);', (cod_documento, cod_palabra))
                 connection.commit()
 
-            cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+            cursor.execute(
+                'SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
             documentosSubidos = cursor.fetchall()
             connection.close()
 
@@ -105,10 +124,10 @@ def buscar():
     if not session:
         return render_template('MenuPrincipal.html')
     else:
-        connection = pymysql.connect(host='localhost',
-                                     user='root',
+        connection = pymysql.connect(host=HOST,
+                                     user=USER,
                                      password='linux321',
-                                     db='BD_PAGINA',
+                                     db=DB,
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
         cursor = connection.cursor()
@@ -128,6 +147,7 @@ def buscar():
             connection.close()
             return render_template('Buscador.html', documentos=documentosEncontrados)
         else:
+            connection.close()
             return render_template('Buscador.html')
 
 
@@ -136,17 +156,18 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password'].encode('utf-8')
-        connection = pymysql.connect(host='localhost',
-                                     user='root',
+        connection = pymysql.connect(host=HOST,
+                                     user=USER,
                                      password='linux321',
-                                     db='BD_PAGINA',
+                                     db=DB,
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
         cursor = connection.cursor()
-        cursor.execute('SELECT * FROM USUARIO WHERE CORREO_USUARIO=%s;', str(email))
+        cursor.execute(
+            'SELECT * FROM USUARIO WHERE CORREO_USUARIO=%s;', str(email))
         user = cursor.fetchone()
 
-        if user is None:
+        if user is None or password == '':
             connection.close()
             return render_template('IniciarSesion.html')
         elif password.decode('utf-8') == user['PASSWORD_USUARIO']:
@@ -155,36 +176,42 @@ def login():
             session['tipo_usuario'] = user['TIPO_USUARIO']
 
             if session['tipo_usuario'] == 'adm':
-                cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+                cursor.execute(
+                    'SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
                 documentosSubidos = cursor.fetchall()
                 connection.close()
                 return render_template('MenuInicioOrg.html', name=session['nombre_usuario'], documentos=documentosSubidos)
             else:
-                cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+                cursor.execute(
+                    'SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
                 documentosSubidos = cursor.fetchall()
                 connection.close()
                 return render_template('MenuInicioUser.html', name=session['nombre_usuario'], documentos=documentosSubidos)
+        connection.close()
+        return render_template('IniciarSesion.html')
 
     else:
 
         if not session:
             return render_template('IniciarSesion.html')
         else:
-            connection = pymysql.connect(host='localhost',
-                                         user='root',
+            connection = pymysql.connect(host=HOST,
+                                         user=USER,
                                          password='linux321',
-                                         db='BD_PAGINA',
+                                         db=DB,
                                          charset='utf8mb4',
                                          cursorclass=pymysql.cursors.DictCursor)
             cursor = connection.cursor()
 
             if session['tipo_usuario'] == 'adm':
-                cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+                cursor.execute(
+                    'SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
                 documentosSubidos = cursor.fetchall()
                 connection.close()
                 return render_template('MenuInicioOrg.html', name=session['nombre_usuario'], documentos=documentosSubidos)
             else:
-                cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+                cursor.execute(
+                    'SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
                 documentosSubidos = cursor.fetchall()
                 connection.close()
                 return render_template('MenuInicioUser.html', name=session['nombre_usuario'], documentos=documentosSubidos)
@@ -196,22 +223,24 @@ def validar():
     if not session:
         return render_template('MenuPrincipal.html')
     else:
-        connection = pymysql.connect(host='localhost',
-                                     user='root',
+        connection = pymysql.connect(host=HOST,
+                                     user=USER,
                                      password='linux321',
-                                     db='BD_PAGINA',
+                                     db=DB,
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
         cursor = connection.cursor()
 
         if request.method == 'POST':
             codValidar = str(list(request.form.keys())[0])
-            cursor.execute('SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codValidar)
+            cursor.execute(
+                'SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codValidar)
             documentoValidar = cursor.fetchone()
             connection.close()
             return render_template('DetalleValidar.html', documento=documentoValidar)
         else:
-            cursor.execute('SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="En espera";')
+            cursor.execute(
+                'SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="En espera";')
             documentosPendientes = cursor.fetchall()
             connection.close()
             return render_template('ValidarDocumento.html', documentos=documentosPendientes)
@@ -223,10 +252,10 @@ def detalleValidar():
     if not session:
         return render_template('MenuPrincipal.html')
     else:
-        connection = pymysql.connect(host='localhost',
-                                     user='root',
+        connection = pymysql.connect(host=HOST,
+                                     user=USER,
                                      password='linux321',
-                                     db='BD_PAGINA',
+                                     db=DB,
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
         cursor = connection.cursor()
@@ -247,12 +276,14 @@ def detalleValidar():
                            (nuevoEstado, observaciones, codValidar))
             connection.commit()
 
-            cursor.execute('SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="En espera";')
+            cursor.execute(
+                'SELECT * FROM DOCUMENTO WHERE ESTADO_DOCUMENTO="En espera";')
             documentosPendientes = cursor.fetchall()
             connection.close()
             return render_template('ValidarDocumento.html', documentos=documentosPendientes)
 
         else:
+            connection.close()
             return render_template('DetalleValidar.html')
 
     return render_template('DetalleValidar.html')
@@ -263,23 +294,27 @@ def desplegar2():
     if not session:
         return render_template('MenuPrincipal.html')
     else:
-        connection = pymysql.connect(host='localhost',
-                                     user='root',
+        connection = pymysql.connect(host=HOST,
+                                     user=USER,
                                      password='linux321',
-                                     db='BD_PAGINA',
+                                     db=DB,
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
         cursor = connection.cursor()
 
         if request.method == 'POST':
             codBorrar = str(list(request.form.keys())[0])
-            cursor.execute('SELECT RUTA_DOCUMENTO FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codBorrar)
-            archivoEliminar = str(cursor.fetchone()['RUTA_DOCUMENTO'])[2:]
-            cursor.execute('DELETE FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codBorrar)
-            os.remove(os.path.join(current_app.root_path, archivoEliminar))
+            cursor.execute(
+                'SELECT RUTA_DOCUMENTO FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codBorrar)
+            archivoEliminar = str(cursor.fetchone()['RUTA_DOCUMENTO'])
+            cursor.execute(
+                'DELETE FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codBorrar)
+            os.remove(os.path.join(
+                app.config['UPLOAD_FOLDER'], archivoEliminar))
             connection.commit()
 
-        cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
+        cursor.execute(
+            'SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s', session['codigo_usuario'])
         documentosSubidos = cursor.fetchall()
         connection.close()
 
@@ -292,10 +327,10 @@ def desplegar3():
     if not session:
         return render_template('MenuPrincipal.html')
     else:
-        connection = pymysql.connect(host='localhost',
-                                     user='root',
+        connection = pymysql.connect(host=HOST,
+                                     user=USER,
                                      password='linux321',
-                                     db='BD_PAGINA',
+                                     db=DB,
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
         cursor = connection.cursor()
@@ -305,18 +340,24 @@ def desplegar3():
             accion = request.form[codDocumento]
 
             if accion == 'Eliminar':
-                cursor.execute('SELECT RUTA_DOCUMENTO FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
-                archivoEliminar = str(cursor.fetchone()['RUTA_DOCUMENTO'])[2:]
-                cursor.execute('DELETE FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
-                os.remove(os.path.join(current_app.root_path, archivoEliminar))
+                cursor.execute(
+                    'SELECT RUTA_DOCUMENTO FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
+                archivoEliminar = str(cursor.fetchone()['RUTA_DOCUMENTO'])
+                cursor.execute(
+                    'DELETE FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
+                os.remove(os.path.join(
+                    app.config['UPLOAD_FOLDER'], archivoEliminar))
                 connection.commit()
 
             else:
-                cursor.execute('SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
+                cursor.execute(
+                    'SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
                 documentoCorregir = cursor.fetchone()
+                connection.close()
                 return render_template('CorregirDocumento.html', documento=documentoCorregir)
 
-        cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s;', session['codigo_usuario'])
+        cursor.execute(
+            'SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s;', session['codigo_usuario'])
         documentosSubidos = cursor.fetchall()
         connection.close()
 
@@ -333,42 +374,47 @@ def corregir():
         FECHA = date.today()
         IDIOMA = request.form['idioma']
         ESTADO = 'En espera'
-        CODIGO_USUARIO = session['codigo_usuario']
 
-        connection = pymysql.connect(host='localhost',
-                                     user='root',
+        connection = pymysql.connect(host=HOST,
+                                     user=USER,
                                      password='linux321',
-                                     db='BD_PAGINA',
+                                     db=DB,
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
         cursor = connection.cursor()
 
         codDocumento = str(list(request.form.keys())[2])
-        cursor.execute('SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
+        cursor.execute(
+            'SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO=%s;', codDocumento)
         documento = cursor.fetchone()
 
         if TITULO != '' and filename[-4:] == '.pdf':
             fechaHora = datetime.now()
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)))
-
-            RUTA = "./archivos/"+str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)
-
-            # codDocumento = str(list(request.form.keys())[0])
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(
+                fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)))
+            RUTA = str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f")) + \
+                "_"+str(filename)
 
             cursor.execute('UPDATE DOCUMENTO SET TITULO_DOCUMENTO = %s, FECHA_SUBIDA = %s, IDIOMA_DOCUMENTO= %s, ESTADO_DOCUMENTO=%s, RUTA_DOCUMENTO=%s WHERE COD_DOCUMENTO=%s;',
                            (TITULO, FECHA, IDIOMA, ESTADO, RUTA, codDocumento))
             connection.commit()
 
-            cursor.execute('SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s;', session['codigo_usuario'])
+            os.remove(os.path.join(
+                app.config['UPLOAD_FOLDER'], documento['RUTA_DOCUMENTO']))
+
+            cursor.execute(
+                'SELECT * FROM DOCUMENTO WHERE USUARIO_COD_USUARIO=%s;', session['codigo_usuario'])
             documentosSubidos = cursor.fetchall()
             connection.close()
 
             return render_template('MenuInicioUser.html', name=session['nombre_usuario'], documentos=documentosSubidos)
 
         elif filename[-4:] != '.pdf':
+            connection.close()
             return render_template('CorregirDocumento.html', mensaje='Debe subir un documento pdf', documento=documento)
 
         else:
+            connection.close()
             return render_template('CorregirDocumento.html', mensaje='Debe llenar todos los campos', documento=documento)
 
 
@@ -383,18 +429,16 @@ def cerrarSesion():
     return welcome()
 
 
-@ app.route('/archivos/<path:filename>', methods=['GET'])
+@ app.route('/<path:filename>', methods=['GET'])
 def descargar(filename):
-    uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
-    return send_from_directory(directory=uploads, filename=filename, as_attachment=True)
+    return send_from_directory(directory=app.config['UPLOAD_FOLDER'], filename=filename, as_attachment=True)
 
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(os.path.join(app.config['SRC_FOLDER'], 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 if __name__ == '__main__':
     app.secret_key = 'helloworld'
-    app.run(debug=False)
-    #app.add_url_rule('/favicon.ico', redirect_to=url_for('static', filename='favicon.ico'))
+    app.run(debug=True)
