@@ -52,11 +52,16 @@
                     <td>{{item['FECHA_SUBIDA']}}</td>
                     <td>{{item['IDIOMA_DOCUMENTO']}}</td>
                     <td>{{item['ESTADO_DOCUMENTO']}}</td>
-                    <td><button class="button is-link is-light">
-                            <a href={{item['RUTA_DOCUMENTO']}}>Descargar</a>
-                        </button></td>
+                    <td>
+                        <a href={{item['RUTA_DOCUMENTO']}} class="button is-link is-light">Descargar</a>
+                    </td>
                     <td>{{item['OBSERVACIONES_DOCUMENTO']}}</td>
+
+                    {% if item['ESTADO_DOCUMENTO'] != 'Validado' %}
                     <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Eliminar"></td>
+                    {% else %}
+                    <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Eliminar" disabled></td>
+                    {% endif %}
 
                     {% if item['ESTADO_DOCUMENTO'] == 'Observado' %}
                     <td><input type="submit" name={{item['COD_DOCUMENTO']}} value="Corregir"></td>

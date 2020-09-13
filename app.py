@@ -47,7 +47,6 @@ def subir():
         if TITULO != '' and filename[-4:] == '.pdf' and PALABRAS[0] != '':
             fechaHora = datetime.now()
 
-            #print(os.path.join(app.config['UPLOAD_FOLDER'], str(fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)))
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(
                 fechaHora.strftime("%d-%m-%Y_%H-%M-%S-%f"))+"_"+str(filename)))
 
@@ -119,36 +118,46 @@ def subir():
 
 
 @app.route("/Buscador.html", methods=['GET', 'POST'])
+@app.route("/BuscadorVisitante.html", methods=['GET', 'POST'])
 def buscar():
 
-    if not session:
-        return render_template('MenuPrincipal.html')
-    else:
-        connection = pymysql.connect(host=HOST,
-                                     user=USER,
-                                     password='linux321',
-                                     db=DB,
-                                     charset='utf8mb4',
-                                     cursorclass=pymysql.cursors.DictCursor)
-        cursor = connection.cursor()
+    connection = pymysql.connect(host=HOST,
+                                 user=USER,
+                                 password='linux321',
+                                 db=DB,
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+    cursor = connection.cursor()
 
-        if request.method == 'POST':
-            textoBuscar = request.form['textoBuscar']
-            palabras = textoBuscar.replace(' ', '').lower().split(',')
-            documentosEncontrados = list()
-            for palabra in palabras:
-                cursor.execute(
-                    'SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO IN (SELECT DOCUMENTO_COD_DOCUMENTO FROM DOCUMENTO_POR_PALABRA WHERE PALABRAS_CLAVE_COD_PALABRA=(SELECT COD_PALABRA FROM PALABRAS_CLAVE WHERE PALABRA=%s) AND ESTADO_DOCUMENTO="Validado" );', palabra)
-                encontrados = cursor.fetchall()
-                for encontrado in encontrados:
-                    if encontrado not in documentosEncontrados:
-                        documentosEncontrados.append(encontrado)
+    cursor.execute('SELECT PC.PALABRA FROM DOCUMENTO_POR_PALABRA DPP INNER JOIN PALABRAS_CLAVE PC ON PC.COD_PALABRA=DPP.PALABRAS_CLAVE_COD_PALABRA GROUP BY PC.PALABRA ORDER BY COUNT(*) DESC LIMIT 3;')
+    top3 = cursor.fetchall()
+    print(top3)
 
-            connection.close()
-            return render_template('Buscador.html', documentos=documentosEncontrados)
+    if request.method == 'POST':
+        textoBuscar = request.form['textoBuscar']
+        #palabras = textoBuscar.replace(' ', '').lower().split(',')
+        palabras = textoBuscar.lower().split(' ')
+        documentosEncontrados = list()
+        for palabra in palabras:
+            cursor.execute(
+                'SELECT * FROM DOCUMENTO WHERE COD_DOCUMENTO IN (SELECT DOCUMENTO_COD_DOCUMENTO FROM DOCUMENTO_POR_PALABRA WHERE PALABRAS_CLAVE_COD_PALABRA=(SELECT COD_PALABRA FROM PALABRAS_CLAVE WHERE PALABRA=%s) AND ESTADO_DOCUMENTO="Validado" );', palabra)
+            encontrados = cursor.fetchall()
+            for encontrado in encontrados:
+                if encontrado not in documentosEncontrados:
+                    documentosEncontrados.append(encontrado)
+
+        connection.close()
+
+        if not session:
+            return render_template('BuscadorVisitante.html', top3=top3, documentos=documentosEncontrados)
         else:
-            connection.close()
-            return render_template('Buscador.html')
+            return render_template('Buscador.html', top3=top3, documentos=documentosEncontrados)
+    else:
+        connection.close()
+        if not session:
+            return render_template('BuscadorVisitante.html', top3=top3)
+        else:
+            return render_template('Buscador.html', top3=top3)
 
 
 @app.route("/IniciarSesion.html", methods=['GET', 'POST'])

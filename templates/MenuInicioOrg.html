@@ -49,9 +49,7 @@
                     <td>{{item['TITULO_DOCUMENTO']}}</td>
                     <td>{{item['FECHA_SUBIDA']}}</td>
                     <td>{{item['IDIOMA_DOCUMENTO']}}</td>
-                    <td><button class="button is-link is-light">
-                            <a href={{item['RUTA_DOCUMENTO']}}>Descargar</a></td>
-                    </button>
+                    <td><a href={{item['RUTA_DOCUMENTO']}} class="button is-link is-light">Descargar</a></td>
                     <td><input class="input is-danger" type="submit" name={{item['COD_DOCUMENTO']}} value="Eliminar">
                     </td>
                 </tr>

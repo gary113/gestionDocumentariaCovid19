@@ -46,6 +46,13 @@
     </div>
     <br>
     <br>
+    <div class=" container">
+        <label>Palabras populares: </label>
+        {% for item in top3: %}
+        {{item['PALABRA']}}
+        {% endfor %}
+    </div>
+    <br>
     <div class="container">
         <table class="table">
             <tr>
@@ -59,9 +66,9 @@
                 <td>{{item['TITULO_DOCUMENTO']}}</td>
                 <td>{{item['FECHA_SUBIDA']}}</td>
                 <td>{{item['IDIOMA_DOCUMENTO']}}</td>
-                <td><button class="button is-link is-light">
-                        <a href={{item['RUTA_DOCUMENTO']}}>Descargar</a>
-                    </button></td>
+                <td>
+                    <a href={{item['RUTA_DOCUMENTO']}} class="button is-link is-light">Descargar</a>
+                </td>
             </tr>
             {% endfor %}
         </table>
